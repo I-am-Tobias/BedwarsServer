@@ -12,7 +12,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.bedwars.stats.BedwarsStats;
-import samann.bwplugin.buildhelper.TreeCommand;
 import samann.bwplugin.commands.*;
 import samann.bwplugin.games.Game;
 import samann.bwplugin.global_events.*;
@@ -127,9 +126,6 @@ public final class BwPlugin extends JavaPlugin {
         MobTower mobTower = new MobTower();
         getCommand("mobtower").setExecutor(mobTower);
         getCommand("mobtower").setTabCompleter(mobTower);
-        TreeCommand treeCommand = new TreeCommand();
-        getCommand("createtree").setExecutor(treeCommand);
-        getCommand("createtree").setTabCompleter(treeCommand);
         CreateWorld createWorld = new CreateWorld();
         getCommand("createworld").setExecutor(createWorld);
         getCommand("createworld").setTabCompleter(createWorld);

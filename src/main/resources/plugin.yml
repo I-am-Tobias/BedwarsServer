@@ -1,0 +1,22 @@
+name: BedwarsServer
+version: '${project.version}'
+main: samann.bwplugin.BwPlugin
+api-version: 1.19
+
+commands:
+  test:
+  poison:
+  summonshop:
+  summonshulker:
+  mobtower:
+  createworld:
+  stats:
+  bedwars:
+    description: bedwars commands
+    aliases:
+      - bw
+  playsound:
+  lobby:
+    aliases:
+      - l
+  worldtp:

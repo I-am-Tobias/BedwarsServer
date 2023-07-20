@@ -23,6 +23,7 @@ import samann.bwplugin.pvp.MoreJumpHeight;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Bedwars extends Game {
@@ -163,6 +164,9 @@ public class Bedwars extends Game {
     }
 
     public void autoTeam(List<Player> playersToAssign){
+        playersToAssign = new ArrayList<>(playersToAssign);
+        Collections.shuffle(playersToAssign);
+
         int minTeams = (playersToAssign.size() - 1) / 4 + 1;
         if(minTeams < 2) minTeams = 2;
         int maxTeams = Math.min(playersToAssign.size(), TeamColor.values().length);

@@ -3,6 +3,7 @@ version: '${project.version}'
 main: samann.bwplugin.BwPlugin
 api-version: 1.19
 
+
 commands:
   test:
   poison:
@@ -20,3 +21,4 @@ commands:
     aliases:
       - l
   worldtp:
+  airwars:

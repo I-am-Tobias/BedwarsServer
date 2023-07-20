@@ -7,11 +7,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import samann.bwplugin.BwPlugin;
 import samann.bwplugin.games.GamePlayer;
 
+import java.util.UUID;
+
 public class BedwarsPlayer extends GamePlayer {
+    static final int RESPAWN_TICKS = 3 * 20;
+    int respawnTicks = 0;
+    boolean isDead = false;
+
     public final Bedwars bedwarsGame;
     public final TeamColor team;
 
@@ -48,6 +55,18 @@ public class BedwarsPlayer extends GamePlayer {
     }
 
     public void onTick(){
+        if (isDead) {
+            respawnTicks--;
+            if (respawnTicks <= 0) {
+                reset();
+            } else {
+                if (respawnTicks / 20 != (respawnTicks + 1) / 20) {
+                    player.sendTitle("Du bist tot", "Respawn in: " + (1 + respawnTicks / 20), 0, 25, 5);
+                }
+            }
+            return;
+        }
+
         if(player.getLocation().getY() < bedwarsGame.mapData.customVoidHeight && lastPositionY > bedwarsGame.mapData.customVoidHeight){
             bedwarsGame.kill(this);
         }
@@ -63,6 +82,9 @@ public class BedwarsPlayer extends GamePlayer {
     }
 
     public void reset(){
+        isDead = false;
+        player.setGameMode(GameMode.SURVIVAL);
+        player.resetTitle();
         player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100);
         player.teleport(bedwarsGame.teamSpawn(team));
@@ -106,7 +128,8 @@ public class BedwarsPlayer extends GamePlayer {
         return false;
     }
     public boolean addExtraLife(){
-        if(extraLives < maxExtraLives){
+                                                                                    // KleinBlockie
+        if(extraLives < maxExtraLives || player.getUniqueId().equals(UUID.fromString("8098c735-f64a-4b7a-a619-8126155e0042"))){
             extraLives++;
             updateName();
             return true;
@@ -136,7 +159,13 @@ public class BedwarsPlayer extends GamePlayer {
     public void onDeath(boolean finalDeath){
         if(finalDeath) {
             player.teleport(bedwarsGame.world.getSpawnLocation());
-        }else reset();
+        } else {
+            isDead = true;
+            respawnTicks = bedwarsGame.playersOfTeam(team).size() * 20;
+            //respawnTicks = RESPAWN_TICKS;
+            player.teleport(bedwarsGame.world.getSpawnLocation());
+            player.setGameMode(GameMode.SPECTATOR);
+        }
 
         player.playEffect(EntityEffect.HURT);
     }

@@ -132,6 +132,7 @@ public final class BwPlugin extends JavaPlugin {
         StatsCommand statsCommand = new StatsCommand();
         getCommand("stats").setExecutor(statsCommand);
         getCommand("stats").setTabCompleter(statsCommand);
+        getCommand("airwars").setExecutor(new AirwarsCommand());
     }
 
     //takes a location and returns a location with integer coordinates

@@ -1,10 +1,12 @@
 package samann.bwplugin.tests;
 
+import net.minecraft.sounds.SoundEvent;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
+
 public class Main {
     public static void main(String[] args) {
-        SuperClass obj = new SubClass();
-        obj.method();
-        obj.runMethod();
+        System.out.println(GameMode.ADVENTURE);
     }
 
     public static class SuperClass{

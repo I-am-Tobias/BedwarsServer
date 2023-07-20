@@ -126,6 +126,22 @@ public enum Category {
                 items.add(getSalableItem(Material.STONE_SWORD, 1, 30));
                 items.add(getSalableItem(Material.IRON_SWORD, 1, 70));
 
+                // bows - without arrows :)
+                items.add(getSalableItem(Material.BOW, 1, 100));
+                ItemStack bow = getSalableItem(Material.BOW, 1, 200);
+                bow.addEnchantment(Enchantment.ARROW_DAMAGE, 1);
+                ItemMeta meta = bow.getItemMeta();
+                meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+                bow.setItemMeta(meta);
+                items.add(bow);
+                bow = getSalableItem(Material.BOW, 1, 300);
+                bow.addEnchantment(Enchantment.ARROW_DAMAGE, 1);
+                bow.addEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+                meta = bow.getItemMeta();
+                meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+                bow.setItemMeta(meta);
+                items.add(bow);
+
                 return items;
             case ARMOR:
                 items.add(getSalableItem(Material.LEATHER_CHESTPLATE, 1, 5));

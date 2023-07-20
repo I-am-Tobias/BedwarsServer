@@ -61,7 +61,7 @@ public class ComboPvp extends GameEvent {
         if(critical) spawnParticles(Particle.CRIT_MAGIC, entity.getEyeLocation());
 
         if(noDamageTicksEntities.containsKey(entity.getUniqueId())){
-            if(damager instanceof Player) ((Player)damager).setSprinting(false);
+            //if(damager instanceof Player) ((Player)damager).setSprinting(false);
             event.setCancelled(true);
             return;
         }
@@ -83,8 +83,8 @@ public class ComboPvp extends GameEvent {
             double boostDistance = 5;
 
             if(damager instanceof Player && ((Player)damager).isSprinting()) {
-                boostDistance *= 1.5;
-                ((Player)damager).setSprinting(false);
+                boostDistance *= 1.3;
+                //((Player)damager).setSprinting(false);
             }
 
             double resistance = -((float)entity.getFreezeTicks() / entity.getMaxFreezeTicks()) * 2;
@@ -103,6 +103,7 @@ public class ComboPvp extends GameEvent {
             knockback.setY(verticalSpeed);
 
             //entity.setFreezeTicks(Math.min(entity.getFreezeTicks() + (critical ? 25 : 35), entity.getMaxFreezeTicks()));
+            if (entity.getVelocity().getY() < 0) knockback.setY(entity.getVelocity().getY() + knockback.getY());
             entity.setVelocity(knockback);
         }
     }

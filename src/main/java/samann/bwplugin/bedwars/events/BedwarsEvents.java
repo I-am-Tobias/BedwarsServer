@@ -1,6 +1,7 @@
 package samann.bwplugin.bedwars.events;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -117,9 +118,6 @@ public class BedwarsEvents extends GameEvent {
     public void onEvent(EntityDamageByEntityEvent event) {
         if(ignoreEvent(event)) return;
 
-        pvp.hit(event);
-        if(event.isCancelled()) return;
-
         Entity source = event.getDamager();
         Entity target = event.getEntity();
 
@@ -127,14 +125,15 @@ public class BedwarsEvents extends GameEvent {
         Player killer = source instanceof Player ? (Player) source : null;
 
         if(player == null) return;
-
+        
         boolean kill = player.getHealth() - event.getFinalDamage() <= 0;
 
         boolean accepted;
         if(killer == null) accepted =  bedwarsGame.damage(player, kill);
         else accepted = bedwarsGame.damage(player, killer, kill);
 
-
+        if(accepted && !kill) pvp.hit(event);
+        if(event.isCancelled()) return;
 
         if(!accepted || kill){
             //event.setCancelled(true);
@@ -142,12 +141,6 @@ public class BedwarsEvents extends GameEvent {
             player.damage(event.getFinalDamage());
         }
         event.setCancelled(true);
-        /*else if(player.getNoDamageTicks() <= 0 && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK){
-            double gravity = 32d / (20 * 20);
-            double boostHeight = 0.3d;
-            double verticalSpeed = Math.sqrt(2 * gravity * boostHeight);
-            player.setVelocity(player.getVelocity().clone().add(new Vector(0, verticalSpeed, 0)));
-        }*/
     }
 
     @EventHandler

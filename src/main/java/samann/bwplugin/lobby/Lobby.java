@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
 import org.bukkit.event.EventHandler;
@@ -18,8 +18,6 @@ import samann.bwplugin.games.Game;
 import samann.bwplugin.games.GamePlayer;
 import samann.bwplugin.games.events.GameEvent;
 import samann.bwplugin.pvp.ComboPvp;
-import samann.bwplugin.pvp.KnockbackCritPvp;
-import samann.bwplugin.pvp.MoreJumpHeight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +180,7 @@ public class Lobby extends Game {
                 player.setVelocity(new Vector(f2, f3, f4));
                 serverPlayer.startAutoSpinAttack(20);
 
-                if (serverPlayer.isOnGround()) {
+                if (serverPlayer.onGround) {
                     float f7 = 1.1999999F;
                     serverPlayer.move(MoverType.SELF, new Vec3(0.0D, f7, 0.0D));
                 }

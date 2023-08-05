@@ -3,10 +3,7 @@ package samann.bwplugin.pvp;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -53,10 +50,9 @@ public class ComboPvp extends GameEvent {
     }
 
     public void hit(EntityDamageByEntityEvent event){
-        if(!(event.getEntity() instanceof LivingEntity) || !(event.getDamager() instanceof HumanEntity)) return;
+        if(!(event.getEntity() instanceof LivingEntity entity) || !(event.getDamager() instanceof HumanEntity damager)) return;
+        if (entity instanceof ArmorStand) return;
 
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        HumanEntity damager = (HumanEntity) event.getDamager();
         boolean critical = damager.getFallDistance() > 0;
         if(critical) spawnParticles(Particle.CRIT_MAGIC, entity.getEyeLocation());
 

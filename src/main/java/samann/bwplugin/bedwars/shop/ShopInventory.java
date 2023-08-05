@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,17 @@ public class ShopInventory extends InventoryView {
     @Override
     public String getTitle() {
         return title;
+    }
+
+    @NotNull
+    @Override
+    public String getOriginalTitle() {
+        return title;
+    }
+
+    @Override
+    public void setTitle(@NotNull String title) {
+        throw new RuntimeException("not allowed :(");
     }
 
 

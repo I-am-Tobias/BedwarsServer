@@ -72,7 +72,7 @@ public final class BwPlugin extends JavaPlugin {
     }
 
     public static void sendToMainLobby(Player player){
-        player.teleport(Bukkit.getWorld("lobby").getSpawnLocation());
+        player.teleport(getIntegerLocation(Bukkit.getWorld("lobby").getSpawnLocation()));
 
         resetAllAttributes(player);
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(100);

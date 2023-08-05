@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import samann.bwplugin.BwPlugin;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class WorldTp implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
         World world = worldArg.parse(args[0], sender);
         assert world != null;
-        player.teleport(world.getSpawnLocation());
+        player.teleport(BwPlugin.getIntegerLocation(world.getSpawnLocation()));
         return true;
     }
 

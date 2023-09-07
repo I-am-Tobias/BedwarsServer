@@ -18,6 +18,7 @@ import samann.bwplugin.games.Game;
 import samann.bwplugin.games.GamePlayer;
 import samann.bwplugin.games.events.GameEvent;
 import samann.bwplugin.pvp.ComboPvp;
+import samann.bwplugin.pvp.MinestomKnockbackPvp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,6 +162,7 @@ public class Lobby extends Game {
                 if(ignoreEvent(event)) return;
 
                 Player player = event.getPlayer();
+                if (player.getGameMode() == GameMode.CREATIVE) return;
                 net.minecraft.world.entity.player.Player serverPlayer = ((CraftPlayer)player).getHandle();
 
                 //riptide level:
@@ -201,6 +203,6 @@ public class Lobby extends Game {
                 event.setCancelled(true);
             }
         });
-        eventManager.register(new ComboPvp(this));
+        eventManager.register(new MinestomKnockbackPvp(this));
     }
 }

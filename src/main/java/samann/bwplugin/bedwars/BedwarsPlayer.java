@@ -7,7 +7,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import samann.bwplugin.BwPlugin;
 import samann.bwplugin.games.GamePlayer;
@@ -182,7 +181,7 @@ public class BedwarsPlayer extends GamePlayer {
         BwPlugin.resetAllAttributes(player);
     }
 
-    public void DamagedBy(BedwarsPlayer attacker){
+    public void damagedBy(BedwarsPlayer attacker){
         if(attacker == null) return;
         lastHitter = attacker;
         lastHitTime = hitterGetsKillTime;

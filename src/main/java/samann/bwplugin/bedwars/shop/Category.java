@@ -182,7 +182,7 @@ public enum Category {
                 potionOfStrengthMeta.setDisplayName("§eTraubensaft");
                 potionOfStrengthMeta.setLocalizedName("salable:strength");
                 potionOfStrengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60 * 20, 0), true);
-                potionOfStrengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60 * 20, 1), true);
+                potionOfStrengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60 * 20, 0), true);
                 potionOfStrengthMeta.setColor(DyeColor.PURPLE.getColor());
                 potionOfStrength.setItemMeta(potionOfStrengthMeta);
                 items.add(potionOfStrength);

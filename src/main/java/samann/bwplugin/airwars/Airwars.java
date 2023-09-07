@@ -4,9 +4,11 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
+import samann.bwplugin.airwars.items.FishingRod;
 import samann.bwplugin.games.Game;
+import samann.bwplugin.games.GamePlayer;
 import samann.bwplugin.games.Spectator;
-import samann.bwplugin.games.events.GameEvent;
 
 public class Airwars extends Game {
   final static String PREFIX = "§bAirwars §8» §r";
@@ -26,7 +28,6 @@ public class Airwars extends Game {
     world.setGameRule(GameRule.DO_FIRE_TICK, false);
     world.setGameRule(GameRule.MOB_GRIEFING, false);
     world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
-    world.setSpawnLocation(0, 30, 0);
   }
 
   @Override
@@ -40,12 +41,13 @@ public class Airwars extends Game {
     if(killer == null){
       msgAll(target.player.getDisplayName() + "§7 ist gestorben!", true);
     }else{
-      msgAll(target.player.getDisplayName() + "§7 wurde von " + killer.player.getDisplayName() + "§7 getötet!", true);
+      msgAll(target.player.getDisplayName() + "§7 wurde von §r" + killer.player.getDisplayName() + "§7 getötet!", true);
       killer.kills++;
       world.playSound(target.player.getLocation(), Sound.ENTITY_GUARDIAN_HURT, 10f, 1f);
     }
 
     target.onDeath();
+    FishingRod.onKill(target);
 
     boolean finalKill = target.getLives() <= 0;
     if(finalKill) {
@@ -58,5 +60,23 @@ public class Airwars extends Game {
     super.registerEvents();
 
     eventManager.register(new AirwarsEvents(this));
+  }
+
+  @Override
+  public void removePlayer(@Nullable GamePlayer player) {
+    super.removePlayer(player);
+    if (running && getPlayers(AirwarsPlayer.class).size() <= 1) {
+      end();
+    }
+  }
+
+  @Override
+  public void end() {
+    if (players.size() == 1) {
+      msgAll("§7 - - - - - - - - - - - - - - - - - - - - -", true);
+      msgAll("§l" + players.get(0).player.getDisplayName() + "§7 hat das Spiel gewonnen!", true);
+      msgAll("§7 - - - - - - - - - - - - - - - - - - - - -", true);
+    }
+    super.end();
   }
 }

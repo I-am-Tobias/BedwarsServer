@@ -17,9 +17,6 @@ import samann.bwplugin.bedwars.stats.GameStats;
 import samann.bwplugin.games.Game;
 import samann.bwplugin.games.GamePlayer;
 import samann.bwplugin.games.Spectator;
-import samann.bwplugin.pvp.ComboPvp;
-import samann.bwplugin.pvp.KnockbackCritPvp;
-import samann.bwplugin.pvp.MoreJumpHeight;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +91,7 @@ public class Bedwars extends Game {
 
         if(bpVictim == null || bpAttacker == null || bpVictim.team == bpAttacker.team) return false;
 
-        bpVictim.DamagedBy(bpAttacker);
+        bpVictim.damagedBy(bpAttacker);
         if(kill) kill(bpVictim);
         return true;
     }

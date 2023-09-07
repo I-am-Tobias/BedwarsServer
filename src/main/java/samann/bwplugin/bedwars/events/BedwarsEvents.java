@@ -33,6 +33,7 @@ import samann.bwplugin.bedwars.shop.ShopInventory;
 import samann.bwplugin.games.GamePlayer;
 import samann.bwplugin.games.events.GameEvent;
 import samann.bwplugin.pvp.ComboPvp;
+import samann.bwplugin.pvp.MinestomKnockbackPvp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +41,10 @@ import java.util.Objects;
 
 public class BedwarsEvents extends GameEvent {
     Bedwars bedwarsGame;
-    ComboPvp pvp;
+    MinestomKnockbackPvp pvp;
     public BedwarsEvents(Bedwars game) {
         bedwarsGame = game;
-        pvp = new ComboPvp(game);
+        pvp = new MinestomKnockbackPvp(game);
     }
 
     @EventHandler
@@ -125,8 +126,10 @@ public class BedwarsEvents extends GameEvent {
         Player killer = source instanceof Player ? (Player) source : null;
 
         if(player == null) return;
+
+        double damage = event.getFinalDamage() / 2;
         
-        boolean kill = player.getHealth() - event.getFinalDamage() <= 0;
+        boolean kill = player.getHealth() - damage <= 0;
 
         boolean accepted;
         if(killer == null) accepted =  bedwarsGame.damage(player, kill);
@@ -138,7 +141,7 @@ public class BedwarsEvents extends GameEvent {
         if(!accepted || kill){
             //event.setCancelled(true);
         }else {
-            player.damage(event.getFinalDamage());
+            player.damage(damage);
         }
         event.setCancelled(true);
     }

@@ -1,11 +1,14 @@
 package samann.bwplugin.airwars;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.BwPlugin;
 import samann.bwplugin.airwars.items.*;
 import samann.bwplugin.games.GamePlayer;
@@ -25,25 +28,32 @@ public class AirwarsPlayer extends GamePlayer {
   private int lives = MAX_HEALTH;
   int kills = 0;
   private boolean boostAvailable = false;
-  public final List<Item> items = List.of(
-          new Fireball(this),
-          new Ghost(this),
-          new Boots(this),
-          new Trident(this),
-          new FishingRod(this),
-          new Anvil(this)
-  );
   private final List<Runnable> itemTicks = new ArrayList<>();
   private final List<Runnable> itemTicksToRemove = new ArrayList<>();
-  public double knockbackMultiplier = 1;
+  private double knockbackMultiplier = 1;
+  public final List<Item> items;
+  private Team team;
 
   public AirwarsPlayer(Player player, Airwars game) {
     super(player, game);
     this.airwarsGame = game;
+    items = List.of(
+            new Fireball(this),
+            new Ghost(this),
+            new Boots(this),
+            new Trident(this),
+            new FishingRod(this),
+            new Anvil(this),
+            new Crossbow(this)
+    );
   }
 
   @Override
   public void onStart() {
+    player.setScoreboard(airwarsGame.scoreboard);
+    team = airwarsGame.scoreboard.registerNewTeam(player.getName());
+    team.addPlayer(player);
+
     player.setGameMode(GameMode.ADVENTURE);
     player.setLevel(0);
     player.getInventory().clear();
@@ -53,12 +63,15 @@ public class AirwarsPlayer extends GamePlayer {
     }
     reset();
     lastPositionY = player.getLocation().getY();
+
   }
 
   @Override
   public void onEnd() {
     player.setPlayerListName(player.getName());
     player.setDisplayName(player.getName());
+    BwPlugin.playerRole.addPlayer(player);
+    player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 
     msg("§lStatistiken:", true);
     msg(" - §6Deine Kills: §f" + kills, true);
@@ -100,11 +113,6 @@ public class AirwarsPlayer extends GamePlayer {
   }
 
   void onTick() {
-    if(player.getLocation().getY() < VOID_HEIGHT && lastPositionY > VOID_HEIGHT){
-      airwarsGame.kill(this);
-    }
-    lastPositionY = player.getLocation().getY();
-    if (lastHitTime > 0) lastHitTime--;
     if(player.isOnGround()) {
       setBoostAvailable(true);
     }
@@ -113,12 +121,22 @@ public class AirwarsPlayer extends GamePlayer {
     for (var itemTick : itemTicks) {
       itemTick.run();
     }
-    knockbackMultiplier = Math.max(1, knockbackMultiplier - 0.05 / 20);
-    updateName();
+    var crossbow = getItem(Crossbow.class);
+    if (crossbow != null) {
+      crossbow.tick();
+    }
+    setKnockbackMultiplier(Math.max(1, getKnockbackMultiplier() - 0.05 / 20));
+
+    if(player.getLocation().getY() < VOID_HEIGHT && lastPositionY > VOID_HEIGHT){
+      airwarsGame.kill(this);
+    } else {
+      lastPositionY = player.getLocation().getY();
+      if (lastHitTime > 0) lastHitTime--;
+    }
   }
 
   public void hitBy(AirwarsPlayer hitter) {
-    if (hitter == this) return;
+    if (hitter == this || hitter == null) return;
     lastHitTime = LAST_HIT_TICKS;
     lastHitter = hitter;
   }
@@ -141,15 +159,23 @@ public class AirwarsPlayer extends GamePlayer {
   public void updateName(){
     String name = player.getName();
 
-    String lives = " " + ChatColor.GOLD;
+    String lives = " " + ChatColor.AQUA;
     for(int i = 0; i < this.lives; i++){
       lives += "❤";
     }
     DecimalFormat decimalFormat = new DecimalFormat("0.0");
-    String kbStr = " §r(" + decimalFormat.format(knockbackMultiplier) + ")";
+    String color = "§r";
+    if (knockbackMultiplier >= 2) {
+      color = "§6";
+    }
+    if (knockbackMultiplier >= 3) {
+      color = "§c";
+    }
+    String kbStr = color +  " (" + decimalFormat.format(knockbackMultiplier) + ")";
 
     player.setPlayerListName(name + lives + kbStr);
     player.setDisplayName(name);
+    team.setSuffix(lives + kbStr);
   }
 
   public boolean getBoostAvailable() {
@@ -168,5 +194,24 @@ public class AirwarsPlayer extends GamePlayer {
 
   public void removeItemTick(Runnable itemTick) {
     itemTicksToRemove.add(itemTick);
+  }
+
+  @Nullable
+  public <T> T getItem(Class<T> itemType) {
+    for (var item : items) {
+      if (itemType.isInstance(item)) {
+        return itemType.cast(item);
+      }
+    }
+    return null;
+  }
+
+  public double getKnockbackMultiplier() {
+    return knockbackMultiplier;
+  }
+
+  public void setKnockbackMultiplier(double newValue) {
+    knockbackMultiplier = newValue;
+    updateName();
   }
 }

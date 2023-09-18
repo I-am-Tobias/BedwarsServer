@@ -1,22 +1,16 @@
 package samann.bwplugin.airwars;
 
-import net.minecraft.world.entity.projectile.FishingHook;
-import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
+import samann.bwplugin.airwars.items.Crossbow;
 import samann.bwplugin.airwars.items.FishingRod;
 import samann.bwplugin.games.events.GameEvent;
 
@@ -63,7 +57,7 @@ public class AirwarsEvents extends GameEvent {
   public void onEvent(EntityDamageByEntityEvent event) {
     if (ignoreEvent(event)) return;
     event.setCancelled(true);
-    pvp.hit(event);
+    pvp.hitEvent(event);
   }
 
   @EventHandler
@@ -123,20 +117,25 @@ public class AirwarsEvents extends GameEvent {
   @EventHandler
   public void onEvent(ProjectileLaunchEvent event) {
     if (ignoreEvent(event)) return;
-    if (event.getEntity() instanceof Trident trident) {
+
+    AirwarsPlayer player = (AirwarsPlayer) airwarsGame.getPlayer((Player) event.getEntity().getShooter());
+    if (player == null) return;
+
+    if (event.getEntity() instanceof Trident) {
       event.setCancelled(true);
-      AirwarsPlayer player = (AirwarsPlayer) airwarsGame.getPlayer((Player) trident.getShooter());
-      for (var item : player.items) {
-        if (item instanceof samann.bwplugin.airwars.items.Trident) {
-          item.use();
-        }
+      var tridentItem = player.getItem(samann.bwplugin.airwars.items.Trident.class);
+      if (tridentItem != null) {
+        tridentItem.use();
       }
     } else if (event.getEntity() instanceof FishHook hook) {
-      AirwarsPlayer player = (AirwarsPlayer) airwarsGame.getPlayer((Player) hook.getShooter());
-      for (var item : player.items) {
-        if (item instanceof FishingRod) {
-          ((FishingRod) item).onThrowHook(hook);
-        }
+      var fishingRod = player.getItem(FishingRod.class);
+      if (fishingRod != null) {
+        fishingRod.onThrowHook(hook);
+      }
+    } else if (event.getEntity() instanceof Arrow arrow) {
+      var crossbow = player.getItem(Crossbow.class);
+      if (crossbow != null) {
+        crossbow.reset();
       }
     }
   }
@@ -145,9 +144,29 @@ public class AirwarsEvents extends GameEvent {
   public void onEvent(ProjectileHitEvent event) {
     if (ignoreEvent(event)) return;
 
+    AirwarsPlayer player = (AirwarsPlayer) airwarsGame.getPlayer((Player) event.getEntity().getShooter());
+    if (player == null) return;
+
     if (event.getEntity() instanceof Fireball fireball) {
       if (event.getHitEntity() == fireball.getShooter()) {
         event.setCancelled(true);
+      }
+    } else if (event.getEntity() instanceof Arrow arrow) {
+      event.setCancelled(true);
+      airwarsGame.world.playSound(arrow.getLocation(), Sound.ENTITY_ARROW_HIT, 1, 1);
+      if (event.getHitEntity() instanceof Player targetPlayer
+              && airwarsGame.getPlayer(targetPlayer) instanceof AirwarsPlayer target) {
+        var crossbow = player.getItem(Crossbow.class);
+        if (crossbow != null) {
+          crossbow.onHit();
+        }
+        var direction = arrow.getVelocity();
+        AirwarsPvp.hit(player, target, 2, direction);
+        player.player.playSound(player.player, Sound.ENTITY_ARROW_HIT_PLAYER, 1f, 1f);
+        arrow.remove();
+      }
+      if (event.getHitEntity() == null) {
+        arrow.remove();
       }
     }
   }
@@ -166,7 +185,7 @@ public class AirwarsEvents extends GameEvent {
             radius + 1,
             radius + 1,
             radius + 1,
-            e -> e instanceof Player player && airwarsGame.getPlayer(player) instanceof AirwarsPlayer
+            e -> e != shooter.player && e instanceof Player player && airwarsGame.getPlayer(player) instanceof AirwarsPlayer
     );
 
     for (var entity : entities) {
@@ -174,14 +193,10 @@ public class AirwarsEvents extends GameEvent {
       double distance = entity.getBoundingBox().getCenter().distance(center.toVector());
       if (distance > radius) continue;
 
-      double strength = Math.sqrt(radius - distance) * player.knockbackMultiplier;
+      double strength = Math.sqrt(radius - distance);
       var direction = (entity.getBoundingBox().getCenter().subtract(center.toVector())).normalize();
-      var boost = direction.multiply(strength);
-      boost.setY(boost.getY() / 4);
 
-      player.player.setVelocity(player.player.getVelocity().multiply(0.5).add(direction.multiply(strength)));
-      player.hitBy(shooter);
-      player.knockbackMultiplier += Math.sqrt(radius - distance) * 0.2;
+      AirwarsPvp.hit(shooter, player, strength, direction);
     }
 
     airwarsGame.world.playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 10f, 1f);

@@ -1,20 +1,16 @@
 package samann.bwplugin.airwars.items;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.airwars.AirwarsPlayer;
 
 public class Boots extends Item {
-  private static final ItemStack ITEM = new ItemStack(Material.GOLDEN_BOOTS);
-
-  static {
-    var meta = ITEM.getItemMeta();
-    meta.setDisplayName("Doppelsprung zurücksetzen");
-    ITEM.setItemMeta(meta);
-  }
-
   public Boots(AirwarsPlayer player) {
-    super(ITEM, 15 * 20, player);
+    super(player, Material.GOLDEN_BOOTS, ChatColor.YELLOW, "Erneuter Sprung",
+            "Aktiviere dieses Item, während du in der Luft bist und keinen Doppelsprung mehr hast, um einen zusätzlichen Doppelsprung zu erhalten.",
+            15 * 20);
   }
 
   @Override

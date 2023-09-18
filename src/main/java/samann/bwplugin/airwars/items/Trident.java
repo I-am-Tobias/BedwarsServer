@@ -3,26 +3,21 @@ package samann.bwplugin.airwars.items;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.airwars.AirwarsPlayer;
 
 public class Trident extends Item {
-  private static final ItemStack ITEM = new ItemStack(Material.TRIDENT);
-  private static final double SPEED = 10;
-
-  static {
-    var meta = ITEM.getItemMeta();
-    meta.setDisplayName("Dreizack");
-    ITEM.setItemMeta(meta);
-  }
-
   public Trident(AirwarsPlayer player) {
-    super(ITEM, 25 * 20, player);
+    super(player, Material.TRIDENT, ChatColor.AQUA, "Dreizack",
+            "Ziehe dich mit dem Dreizack in Blickrichtung und stoße Gegner weg, die du währenddessen triffst.",
+            25 * 20);
   }
 
   @Override

@@ -1,26 +1,15 @@
 package samann.bwplugin.airwars;
 
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import samann.bwplugin.BwPlugin;
-import samann.bwplugin.games.Game;
 import samann.bwplugin.games.events.GameEvent;
 
 import java.util.HashMap;
@@ -47,7 +36,7 @@ public class AirwarsPvp extends GameEvent {
         }
     }
 
-    public void hit(EntityDamageByEntityEvent event){
+    public void hitEvent(EntityDamageByEntityEvent event){
         AirwarsPlayer target;
         AirwarsPlayer hitter;
         try {
@@ -72,23 +61,29 @@ public class AirwarsPvp extends GameEvent {
             noDamageTicksEntities.put(target.player.getUniqueId(), noDamageTicks);
             target.player.getWorld().playSound(target.player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1);
 
-            target.player.playHurtAnimation(0);
-
             boolean riptide = hitter.player.isRiptiding();
-            float strength = riptide ? 2f : 1f;
-            strength *= target.knockbackMultiplier;
             float yaw = hitter.player.getLocation().getYaw();
-            takeKnockback(target.player, strength, Math.sin(Math.toRadians(yaw)), -Math.cos(Math.toRadians(yaw)));
-            target.hitBy(hitter);
-            target.knockbackMultiplier += riptide ? 0.3 : 0.2;
+            hit(hitter, target, riptide ? 2.5 : 1, yaw);
         }
     }
 
-    public static void knock(AirwarsPlayer hitter, AirwarsPlayer target, double baseStrength, Vector direction) {
+    public static void hit(AirwarsPlayer hitter, AirwarsPlayer target, double baseStrength, Vector direction) {
         target.player.playHurtAnimation(0);
+        target.hitBy(hitter);
+
+        double strength = baseStrength * target.getKnockbackMultiplier();
+        target.setKnockbackMultiplier(target.getKnockbackMultiplier() + baseStrength / 5);
+
+        direction = direction.clone().multiply(-1).setY(0).normalize();
+
+        takeKnockback(target.player, (float) strength, direction.getX(), direction.getZ());
     }
 
-    public static void takeKnockback(LivingEntity entity, float strength, final double x, final double z) {
+    public static void hit(AirwarsPlayer hitter, AirwarsPlayer target, double baseStrength, float yaw) {
+        hit(hitter, target, baseStrength, new Vector(-Math.sin(Math.toRadians(yaw)), 0, Math.cos(Math.toRadians(yaw))));
+    }
+
+    private static void takeKnockback(LivingEntity entity, float strength, final double x, final double z) {
         if (strength > 0.0F) {
             Vector velocityModifier = (new Vector(x, 0, z)).normalize().multiply(strength);
             entity.setVelocity(new Vector(

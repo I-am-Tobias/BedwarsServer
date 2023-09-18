@@ -1,10 +1,9 @@
 package samann.bwplugin.airwars.items;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import samann.bwplugin.airwars.AirwarsPlayer;
 
@@ -12,22 +11,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FishingRod extends Item {
-  private static final ItemStack ITEM = new ItemStack(Material.FISHING_ROD);
   private static final int ACTIVE_TICKS = 7 * 20;
   private boolean isActive = false;
   private int ticksLeft = 0;
   private final Runnable activeTick = this::activeTick;
   private FishHook hook;
   private static final Set<FishingRod> activeRods = new HashSet<>();
-
-  static {
-    var meta = ITEM.getItemMeta();
-    meta.setDisplayName("Angel");
-    ITEM.setItemMeta(meta);
-  }
+  private boolean hitSomething = false;
 
   public FishingRod(AirwarsPlayer player) {
-    super(ITEM, 15 * 20, player);
+    super(player, Material.FISHING_ROD, ChatColor.LIGHT_PURPLE, "Angel",
+            "Aktiviere, um den Angelhaken zu werfen. Wenn der Angelhaken auf dem Boden aufliegt oder ein Spieler getroffen wurde, kannst du erneut aktivieren, um dich zum Haken zu ziehen.",
+            15 * 20);
   }
 
   @Override
@@ -44,6 +39,11 @@ public class FishingRod extends Item {
       return;
     }
     setDurability((double) ticksLeft / ACTIVE_TICKS);
+    boolean hitSomething = hook.getHookedEntity() != null || hook.isOnGround();
+    if (hitSomething && !this.hitSomething) {
+      player.player.playSound(player.player, Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1, 1);
+    }
+    this.hitSomething = hitSomething;
   }
 
   private void start() {
@@ -52,11 +52,11 @@ public class FishingRod extends Item {
     setEnchanted(true);
     ticksLeft = ACTIVE_TICKS;
     player.addItemTick(activeTick);
+    hitSomething = false;
   }
 
   private void end() {
-    var hookedIn = hook.getHookedEntity();
-    if (hookedIn != null || hook.isOnGround()) {
+    if (hitSomething) {
       var hookPos = hook.getBoundingBox().getCenter();
       var playerPos = player.player.getLocation().toVector();
       var delta = hookPos.subtract(playerPos.setY(playerPos.getY() + 1));

@@ -1,22 +1,19 @@
 package samann.bwplugin.airwars.items;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.airwars.AirwarsPlayer;
 
 public class Fireball extends Item {
-  private static final ItemStack ITEM = new ItemStack(Material.MAGMA_CREAM);
   private static final double SPEED = 10;
 
-  static {
-    var meta = ITEM.getItemMeta();
-    meta.setDisplayName("Feuerball");
-    ITEM.setItemMeta(meta);
-  }
-
   public Fireball(AirwarsPlayer player) {
-    super(ITEM, 20 * 20, player);
+    super(player, Material.MAGMA_CREAM, ChatColor.GOLD, "Feuerball",
+            "Wirf einen Feuerball, der beim Auftreffen eine Explosion auslöst.",
+            20 * 20);//20
   }
 
   @Override

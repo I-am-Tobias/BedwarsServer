@@ -1,9 +1,8 @@
 package samann.bwplugin.airwars;
 
-import org.bukkit.Difficulty;
-import org.bukkit.GameRule;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.airwars.items.FishingRod;
 import samann.bwplugin.games.Game;
@@ -12,8 +11,10 @@ import samann.bwplugin.games.Spectator;
 
 public class Airwars extends Game {
   final static String PREFIX = "§bAirwars §8» §r";
+  final Scoreboard scoreboard;
   public Airwars(World world) {
     super(world, PREFIX);
+    scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
   }
 
   @Override

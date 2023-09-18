@@ -1,28 +1,21 @@
 package samann.bwplugin.airwars.items;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import samann.bwplugin.airwars.AirwarsPlayer;
 import samann.bwplugin.airwars.AirwarsPvp;
 
 public class Anvil extends Item {
-  private static final ItemStack ITEM = new ItemStack(Material.FLINT_AND_STEEL);
   private boolean isActive = false;
   private final Runnable tick = this::tick;
 
-  static {
-    var meta = ITEM.getItemMeta();
-    meta.setDisplayName("STAMPFATTACKE");
-    ITEM.setItemMeta(meta);
-  }
-
   public Anvil(AirwarsPlayer player) {
-    super(ITEM, 10 * 20, player);
+    super(player, Material.ANVIL, ChatColor.GRAY, "Stampfattacke",
+            "Aktiviere dieses Item, während du in der Luft bist, um dich fallen zu lassen und Gegner im Umkreis wegzustoßen.",
+            10 * 20);
   }
 
   @Override
@@ -48,21 +41,17 @@ public class Anvil extends Item {
         if (!(entity instanceof Player t && player.game.getPlayer(t) instanceof AirwarsPlayer target)) continue;
         if (target == player) continue;
         var direction = target.player.getLocation().toVector()
-                .subtract(player.player.getLocation().toVector())
-                .setY(0)
-                .normalize();
+                .subtract(player.player.getLocation().toVector());
         float strength = 1.5f;
-        strength *= target.knockbackMultiplier;
-        AirwarsPvp.takeKnockback(target.player, strength, direction.getX(), direction.getZ());
-        target.hitBy(player);
-        target.player.playHurtAnimation(0);
+        AirwarsPvp.hit(player, target, strength, direction);
       }
-      world.playSound(player.player.getLocation(), Sound.BLOCK_BELL_USE, 10, 0.8f);
+      //world.playSound(player.player.getLocation(), Sound.BLOCK_BELL_USE, 10, 0.8f);
+      world.playEffect(player.player.getLocation(), Effect.ANVIL_LAND, 0);
       world.spawnParticle(Particle.SPIT, player.player.getLocation(), 30, radius / 2, 0, radius / 2);
       reset();
-    }
-    if (player.player.getVelocity().getY() > 0) {
+    } else if (player.player.getVelocity().getY() > 0) {
       reset();
+      removeCooldown();
     }
   }
 

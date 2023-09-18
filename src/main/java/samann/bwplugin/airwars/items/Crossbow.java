@@ -102,4 +102,13 @@ public class Crossbow extends Item {
   public boolean callUseOnRightClick() {
     return false;
   }
+
+  @Override
+  public Progress currentProgress() {
+    if (state == State.LOAD) {
+      return new Progress(Progress.State.ACTIVE, loadingTicks, LOADING_TIME);
+    } else {
+      return super.currentProgress();
+    }
+  }
 }

@@ -110,4 +110,16 @@ public abstract class Item {
     item.setItemMeta(meta);
     return item;
   }
+
+  public Progress currentProgress() {
+    if (hasCooldown()) {
+      return new Progress(Progress.State.COOLDOWN, cooldown - player.player.getCooldown(item.getType()), cooldown);
+    } else {
+      if (canUse()) {
+        return new Progress(Progress.State.READY, 1);
+      } else {
+        return new Progress(Progress.State.READY, 0);
+      }
+    }
+  }
 }

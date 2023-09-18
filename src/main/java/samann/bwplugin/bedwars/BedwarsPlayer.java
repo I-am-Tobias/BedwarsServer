@@ -68,6 +68,7 @@ public class BedwarsPlayer extends GamePlayer {
 
         if(player.getLocation().getY() < bedwarsGame.mapData.customVoidHeight && lastPositionY > bedwarsGame.mapData.customVoidHeight){
             bedwarsGame.kill(this);
+            return;
         }
         lastPositionY = player.getLocation().getY();
 

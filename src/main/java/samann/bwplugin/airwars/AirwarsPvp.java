@@ -86,11 +86,14 @@ public class AirwarsPvp extends GameEvent {
     private static void takeKnockback(LivingEntity entity, float strength, final double x, final double z) {
         if (strength > 0.0F) {
             Vector velocityModifier = (new Vector(x, 0, z)).normalize().multiply(strength);
+            double verticalLimit = 0.8;
+            double verticalVelocity = entity.isOnGround()
+                    ? entity.getVelocity().getY() / 2.0 + (double)strength / 2
+                    : entity.getVelocity().getY() + (double)strength / 4;
+            verticalVelocity = Math.min(verticalLimit, verticalVelocity);
             entity.setVelocity(new Vector(
                     entity.getVelocity().getX() / 2.0 - velocityModifier.getX(),
-                    entity.isOnGround()
-                            ? entity.getVelocity().getY() / 2.0 + (double)strength / 2
-                            : entity.getVelocity().getY() + (double)strength / 4,
+                    verticalVelocity,
                     entity.getVelocity().getZ() / 2.0 - velocityModifier.getZ()));
         }
     }

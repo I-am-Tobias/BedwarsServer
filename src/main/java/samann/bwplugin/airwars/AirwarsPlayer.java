@@ -1,5 +1,7 @@
 package samann.bwplugin.airwars;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
@@ -72,6 +74,7 @@ public class AirwarsPlayer extends GamePlayer {
     player.setDisplayName(player.getName());
     BwPlugin.playerRole.addPlayer(player);
     player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent());
 
     msg("§lStatistiken:", true);
     msg(" - §6Deine Kills: §f" + kills, true);
@@ -125,6 +128,8 @@ public class AirwarsPlayer extends GamePlayer {
     if (crossbow != null) {
       crossbow.tick();
     }
+    sendActionBarText();
+
     setKnockbackMultiplier(Math.max(1, getKnockbackMultiplier() - 0.05 / 20));
 
     if(player.getLocation().getY() < VOID_HEIGHT && lastPositionY > VOID_HEIGHT){
@@ -213,5 +218,37 @@ public class AirwarsPlayer extends GamePlayer {
   public void setKnockbackMultiplier(double newValue) {
     knockbackMultiplier = newValue;
     updateName();
+  }
+
+  private void sendActionBarText() {
+    Progress progress = null;
+    for (var item : items) {
+      if (item.isItem(player.getInventory().getItemInMainHand())) {
+        progress = item.currentProgress();
+        break;
+      }
+    }
+    if (progress == null) {
+      player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent());
+      return;
+    }
+    char toRepeat = '|';
+    int count = 20;
+    StringBuilder text = new StringBuilder("" + switch (progress.state()) {
+      case COOLDOWN -> ChatColor.RED;
+      case ACTIVE -> ChatColor.YELLOW;
+      case READY -> ChatColor.GREEN;
+    });
+    boolean colored = true;
+    for (int i = 0; i < count; i++) {
+      if (colored) {
+        if (((double) i) / count >= progress.progress()) {
+          colored = false;
+          text.append(ChatColor.GRAY);
+        }
+      }
+      text.append(toRepeat);
+    }
+    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text.toString()));
   }
 }

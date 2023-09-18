@@ -62,4 +62,13 @@ public class Anvil extends Item {
     isActive = false;
     setEnchanted(false);
   }
+
+  @Override
+  public Progress currentProgress() {
+    if (isActive) {
+      return new Progress(Progress.State.ACTIVE, 1);
+    } else {
+      return super.currentProgress();
+    }
+  }
 }

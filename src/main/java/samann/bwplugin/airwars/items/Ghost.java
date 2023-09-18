@@ -81,4 +81,13 @@ public class Ghost extends Item {
     player.removeItemTick(activeTick);
     if (laser.isStarted()) laser.stop();
   }
+
+  @Override
+  public Progress currentProgress() {
+    if (isActive) {
+      return new Progress(Progress.State.ACTIVE, ticksLeft, ACTIVE_TICKS);
+    } else{
+      return super.currentProgress();
+    }
+  }
 }

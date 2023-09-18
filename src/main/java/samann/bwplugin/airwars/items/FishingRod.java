@@ -99,4 +99,17 @@ public class FishingRod extends Item {
       }
     }
   }
+
+  @Override
+  public Progress currentProgress() {
+    if (isActive) {
+      if (hitSomething) {
+        return new Progress(Progress.State.READY, ticksLeft, ACTIVE_TICKS);
+      } else {
+        return new Progress(Progress.State.ACTIVE, ticksLeft, ACTIVE_TICKS);
+      }
+    } else{
+      return super.currentProgress();
+    }
+  }
 }
